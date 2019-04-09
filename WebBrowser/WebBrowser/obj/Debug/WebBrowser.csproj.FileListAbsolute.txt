@@ -1,0 +1,12 @@
+C:\Users\Daniel\source\repos\WebBrowser\WebBrowser\bin\Debug\WebBrowser.exe.config
+C:\Users\Daniel\source\repos\WebBrowser\WebBrowser\bin\Debug\WebBrowser.exe
+C:\Users\Daniel\source\repos\WebBrowser\WebBrowser\bin\Debug\WebBrowser.pdb
+C:\Users\Daniel\source\repos\WebBrowser\WebBrowser\obj\Debug\WebBrowser.csprojAssemblyReference.cache
+C:\Users\Daniel\source\repos\WebBrowser\WebBrowser\obj\Debug\WebBrowser.Form1.resources
+C:\Users\Daniel\source\repos\WebBrowser\WebBrowser\obj\Debug\WebBrowser.Properties.Resources.resources
+C:\Users\Daniel\source\repos\WebBrowser\WebBrowser\obj\Debug\WebBrowser.csproj.GenerateResource.cache
+C:\Users\Daniel\source\repos\WebBrowser\WebBrowser\obj\Debug\WebBrowser.csproj.CoreCompileInputs.cache
+C:\Users\Daniel\source\repos\WebBrowser\WebBrowser\obj\Debug\WebBrowser.exe
+C:\Users\Daniel\source\repos\WebBrowser\WebBrowser\obj\Debug\WebBrowser.pdb
+C:\Users\Daniel\source\repos\WebBrowser\WebBrowser\obj\Debug\Interop.MSHTML.dll
+C:\Users\Daniel\source\repos\WebBrowser\WebBrowser\obj\Debug\WebBrowser.csproj.ResolveComReference.cache
