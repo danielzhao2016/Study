@@ -1,2 +1,14 @@
 https://stackoverflow.com/questions/9110388/web-browser-control-how-to-capture-document-events
 https://gist.github.com/jeremybeavon/aa2979b4aeb911de8be8e9805ac15ed7#file-uwp-app-overview-txt
+
+cd /c/git
+git config --global user.name "danielzhao2016"
+git config --global user.email daniel79217@hotmail.com
+git clone https://github.com/danielzhao2016/Study.git
+
+git add test.txt
+git status
+git commit -m "commit message" test.txt
+git commit -m "commit message" -A
+
+git push -u origin master
