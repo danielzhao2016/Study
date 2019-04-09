@@ -6,11 +6,15 @@ git config --global user.name "danielzhao2016"
 git config --global user.email daniel79217@hotmail.com
 git clone https://github.com/danielzhao2016/Study.git
 
+touch .gitignore
+(add ignore files in the file .gitignore)
+
 git add test.txt
+git add -A
 git status
 git commit -m "commit message" test.txt
-git commit -m "commit message" -A
+git commit -m "commit message" -a
 
 git push -u origin master
 
-git pull
+git pull -u origin master
