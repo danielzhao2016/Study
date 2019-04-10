@@ -6,6 +6,9 @@ git config --global user.name "danielzhao2016"
 git config --global user.email daniel79217@hotmail.com
 git clone https://github.com/danielzhao2016/Study.git
 
+git init
+rm -rf .git
+
 touch .gitignore
 (add ignore files in the file .gitignore)
 
@@ -18,3 +21,5 @@ git commit -m "commit message" -a
 git push -u origin master
 
 git pull -u origin master
+
+Cosmos database
