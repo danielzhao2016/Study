@@ -1,23 +1,12 @@
-import requests
-from requests.auth import HTTPBasicAuth
-import argparse
-
-def get_confluence_content(base_url, page_id, username, password):
-    # ... [function remains unchanged]
-
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Fetch content from Confluence.')
-    parser.add_argument('--base_url', required=True, help='Base URL of the Confluence instance.')
-    parser.add_argument('--page_id', required=True, help='ID of the Confluence page to retrieve.')
-    parser.add_argument('--username', required=True, help='Confluence username.')
-    parser.add_argument('--password', required=True, help='Confluence password.')
+    BASE_URL = "https://YOUR_CONFLUENCE_INSTANCE_URL"
+    USERNAME = "YOUR_USERNAME"
+    PASSWORD = "YOUR_PASSWORD"
+    
+    page_ids = ["PAGE_ID_1", "PAGE_ID_2", "PAGE_ID_3"]  # Replace with your actual page IDs
 
-    args = parser.parse_args()
-
-    content = get_confluence_content(args.base_url, args.page_id, args.username, args.password)
-    print(content)
-
-
-
-
-python your_script_name.py --base_url https://YOUR_CONFLUENCE_INSTANCE_URL --page_id YOUR_PAGE_ID --username YOUR_USERNAME --password YOUR_PASSWORD
+    for page_id in page_ids:
+        content = get_confluence_content(BASE_URL, page_id, USERNAME, PASSWORD)
+        print(f"Content for Page ID {page_id}:")
+        print(content)
+        print("-" * 50)  # Separator for clarity
