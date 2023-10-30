@@ -1,20 +1,20 @@
 import requests
 from requests.auth import HTTPBasicAuth
 
-def search_confluence(base_url, query, username, password):
+def search_confluence(base_url, searchString, username, password):
     """
-    Search Confluence pages based on a search query.
+    Search Confluence pages based on a given searchString.
 
     :param base_url: Base URL of the Confluence instance.
-    :param query: Search query in CQL format.
+    :param searchString: String to search for in Confluence.
     :param username: Confluence username.
     :param password: Confluence password.
-    :return: List of pages matching the query.
+    :return: Content of the top 3 matching pages as strings.
     """
     search_url = f"{base_url}/rest/api/content/search"
     params = {
-        "cql": query,
-        "limit": 25  # You can adjust this limit as needed.
+        "cql": f"title ~ '{searchString}'",
+        "limit": 3  # Get top 3 results.
     }
 
     response = requests.get(search_url, params=params, auth=HTTPBasicAuth(username, password))
@@ -23,14 +23,30 @@ def search_confluence(base_url, query, username, password):
         raise Exception(f"Failed to search content. Status code: {response.status_code}")
 
     data = response.json()
-    return data["results"]
+    results = data["results"]
 
+    # Fetch content of the top 3 pages
+    page_contents = []
+    for page in results:
+        page_id = page["id"]
+        content_url = f"{base_url}/rest/api/content/{page_id}?expand=body.storage"
+        content_response = requests.get(content_url, auth=HTTPBasicAuth(username, password))
+        
+        if content_response.status_code == 200:
+            content_data = content_response.json()
+            page_contents.append(content_data["body"]["storage"]["value"])
+
+    return page_contents
+
+# Example usage:
 if __name__ == "__main__":
     BASE_URL = "https://YOUR_CONFLUENCE_INSTANCE_URL"
-    QUERY = "title ~ 'YOUR_SEARCH_TERM'"  # Replace with your search term. This searches for pages where title contains the term.
+    SEARCH_STRING = "YOUR_SEARCH_STRING"
     USERNAME = "YOUR_USERNAME"
     PASSWORD = "YOUR_PASSWORD"
 
-    pages = search_confluence(BASE_URL, QUERY, USERNAME, PASSWORD)
-    for page in pages:
-        print(page["title"], "-", page["_links"]["webui"])
+    pages_content = search_confluence(BASE_URL, SEARCH_STRING, USERNAME, PASSWORD)
+    for idx, content in enumerate(pages_content, 1):
+        print(f"Content of Page {idx}:\n")
+        print(content)
+        print("=" * 50)
