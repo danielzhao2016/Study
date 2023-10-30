@@ -1,23 +1,5 @@
-(function() {
-    'use strict';
+var $ = jQuery;
 
-    // A function to add the button to the page
-    function addButton() {
-        // Try finding the element where you want to place the button. This might change based on Jira's structure.
-        const container = document.querySelector('#description-val');  // This selects the description box, you can adjust as needed.
-
-        if (!container) return;  // If the container isn't found, exit.
-
-        // Create the button element
-        const btn = document.createElement('a');
-        btn.href = 'YOUR_DESIRED_URL_HERE'; // Replace with your URL
-        btn.innerText = 'Go to my URL';
-        btn.className = 'aui-button'; // This makes it look like a typical Jira button.
-
-        // Append the button to the container
-        container.parentNode.insertBefore(btn, container.nextSibling);
-    }
-
-    // Wait for the DOM to load
-    document.addEventListener("DOMContentLoaded", addButton);
-})();
+$( document ).ready(function() {
+    $('#opsbar-opsbar-transitions').append('<div id="opsbar-comment-update-story" class="aui-buttons pluggable-ops"><a style="margin-left: 1em; background: seagreen; color: white;" id="comment-issue" role="button" title="Comment on this issue" class="aui-button toolbar-trigger issueaction-comment-issue add-issue-comment inline-comment" href="http://127.0.0.1:7860/?key=CMCMP-1234"><span class="icon aui-icon aui-icon-small aui-iconfont-comment icon-comment"></span> <span class="trigger-label">Lauch AI Refinement</span></a></div>');
+});
