@@ -1,20 +1,5 @@
-var $ = jQuery;
+def updateJiraClick():
+    #write your code here
 
-$(document).ready(function() {
-    // Append the button first
-    $('#opsbar-opsbar-transitions').append('<div id="opsbar-comment-update-story" class="aui-buttons pluggable-ops"><a style="margin-left: 1em; background: seagreen; color: white;" id="comment-issue" role="button" title="Comment on this issue" class="aui-button toolbar-trigger issueaction-comment-issue add-issue-comment inline-comment" href="#"><span class="icon aui-icon aui-icon-small" style="background-image: url(https://danicon); background-repeat: no-repeat; background-size: contain; background-position: center;"></span> <span class="trigger-label">Launch AI Refinement</span></a></div>');
-
-    // Attach a click event handler to the button
-    $('#comment-issue').on('click', function(e) {
-        e.preventDefault(); // Prevent default action
-
-        // Assuming descriptionTextBox is an id of a textbox or textarea
-        var descriptionText = encodeURIComponent($('#descriptionTextBox').val());
-
-        // Construct the URL with the description
-        var url = `http://127.0.0.1:7860/?key=CMCMP-1234&description=${descriptionText}`;
-
-        // Navigate to the URL
-        window.location.href = url;
-    });
-});
+updateJira = gr.Button("Update JIRA",scale=0, variant="secondary")
+updateJira.click(updateJiraClick, None, None)
