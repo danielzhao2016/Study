@@ -1,5 +1,20 @@
-def updateJiraClick():
-    #write your code here
+import tkinter as tk
+from tkinter import messagebox
 
-updateJira = gr.Button("Update JIRA",scale=0, variant="secondary")
-updateJira.click(updateJiraClick, None, None)
+def updateJiraClick():
+    # Create the root window but don't show it
+    root = tk.Tk()
+    root.withdraw()
+
+    # Create and display a messagebox asking for confirmation
+    response = messagebox.askyesno("Confirmation", "Do you really want to update?")
+
+    # Check user's response
+    if response:
+        # Code to update JIRA goes here
+        print("Updating JIRA...")
+    else:
+        print("Update cancelled.")
+
+    # Destroy the root window
+    root.destroy()
