@@ -1,9 +1,23 @@
-// ==UserScript==
-// @name         Jira Add Button
-// @namespace    http://tampermonkey.net/
-// @version      0.1
-// @description  Add a button to Jira story
-// @author       Your Name
-// @match        https://jira.mycompany.com/*
-// @grant        none
-// ==/UserScript==
+(function() {
+    'use strict';
+
+    // A function to add the button to the page
+    function addButton() {
+        // Try finding the element where you want to place the button. This might change based on Jira's structure.
+        const container = document.querySelector('#description-val');  // This selects the description box, you can adjust as needed.
+
+        if (!container) return;  // If the container isn't found, exit.
+
+        // Create the button element
+        const btn = document.createElement('a');
+        btn.href = 'YOUR_DESIRED_URL_HERE'; // Replace with your URL
+        btn.innerText = 'Go to my URL';
+        btn.className = 'aui-button'; // This makes it look like a typical Jira button.
+
+        // Append the button to the container
+        container.parentNode.insertBefore(btn, container.nextSibling);
+    }
+
+    // Wait for the DOM to load
+    document.addEventListener("DOMContentLoaded", addButton);
+})();
