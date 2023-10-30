@@ -1,5 +1,5 @@
 var $ = jQuery;
 
-$( document ).ready(function() {
-    $('#opsbar-opsbar-transitions').append('<div id="opsbar-comment-update-story" class="aui-buttons pluggable-ops"><a style="margin-left: 1em; background: seagreen; color: white;" id="comment-issue" role="button" title="Comment on this issue" class="aui-button toolbar-trigger issueaction-comment-issue add-issue-comment inline-comment" href="http://127.0.0.1:7860/?key=CMCMP-1234"><span class="icon aui-icon aui-icon-small aui-iconfont-comment icon-comment"></span> <span class="trigger-label">Lauch AI Refinement</span></a></div>');
+$(document).ready(function() {
+    $('#opsbar-opsbar-transitions').append('<div id="opsbar-comment-update-story" class="aui-buttons pluggable-ops"><a style="margin-left: 1em; background: seagreen; color: white;" id="comment-issue" role="button" title="Comment on this issue" class="aui-button toolbar-trigger issueaction-comment-issue add-issue-comment inline-comment" href="http://127.0.0.1:7860/?key=CMCMP-1234"><span class="icon aui-icon aui-icon-small" style="background-image: url(https://danicon); background-repeat: no-repeat; background-size: contain;"></span> <span class="trigger-label">Launch AI Refinement</span></a></div>');
 });
