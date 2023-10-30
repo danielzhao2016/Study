@@ -1,12 +1,36 @@
+import requests
+from requests.auth import HTTPBasicAuth
+
+def search_confluence(base_url, query, username, password):
+    """
+    Search Confluence pages based on a search query.
+
+    :param base_url: Base URL of the Confluence instance.
+    :param query: Search query in CQL format.
+    :param username: Confluence username.
+    :param password: Confluence password.
+    :return: List of pages matching the query.
+    """
+    search_url = f"{base_url}/rest/api/content/search"
+    params = {
+        "cql": query,
+        "limit": 25  # You can adjust this limit as needed.
+    }
+
+    response = requests.get(search_url, params=params, auth=HTTPBasicAuth(username, password))
+
+    if response.status_code != 200:
+        raise Exception(f"Failed to search content. Status code: {response.status_code}")
+
+    data = response.json()
+    return data["results"]
+
 if __name__ == "__main__":
     BASE_URL = "https://YOUR_CONFLUENCE_INSTANCE_URL"
+    QUERY = "title ~ 'YOUR_SEARCH_TERM'"  # Replace with your search term. This searches for pages where title contains the term.
     USERNAME = "YOUR_USERNAME"
     PASSWORD = "YOUR_PASSWORD"
-    
-    page_ids = ["PAGE_ID_1", "PAGE_ID_2", "PAGE_ID_3"]  # Replace with your actual page IDs
 
-    for page_id in page_ids:
-        content = get_confluence_content(BASE_URL, page_id, USERNAME, PASSWORD)
-        print(f"Content for Page ID {page_id}:")
-        print(content)
-        print("-" * 50)  # Separator for clarity
+    pages = search_confluence(BASE_URL, QUERY, USERNAME, PASSWORD)
+    for page in pages:
+        print(page["title"], "-", page["_links"]["webui"])
