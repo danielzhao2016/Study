@@ -1,16 +1,58 @@
+def updateJira(storyID, ai_description,ai_acceptance_criteria,ai_story_points):
+    # Set the Jira API endpoint URL and issue key
+    url = "https://jira.fis.dev/rest/api/2/issue/"+ storyID
+    comment_url="https://jira.fis.dev/rest/api/2/issue/"+ storyID+"/comment"
+
+    # Set the new values in a dictionary
+    data = {
+        "fields": {
+            "description": "ai_description",
+            "customfield_18460": "ai_acceptance_criteria",
+            "customfield_10563": 5
+        } 
+    }
+    load_dotenv()
+    UNAME=getenv('UNAME')
+    PASSWORD=getenv('PASSWORD') 
+
+    headers = {
+        "Content-Type": "application/json"
+    }
+    # Send a PUT request to update the issue with the new values
+    # response = requests.put(url, headers=headers, data=json.dumps({"fields": data}), auth=HTTPBasicAuth(UNAME, PASSWORD), verify=False)
+    response = requests.put(url, headers=headers, json=data, auth=HTTPBasicAuth(UNAME, PASSWORD), verify=False)
+
+    # Print the response status code and content
+    print("Status code:", response.status_code)
+    print("Response content:", response.content)
+    return response
+
+
+
 with gr.TabItem("Story Details", id="story") as summaryTab:
-                gr.Markdown("### Updated User Story")
-                gr.Textbox(
-                    type="text", label="JIRA Story Key", info="Enter JIRA ID here"
-                )
-                gr.Textbox(
-                    type="text", label="Description", info="Enter JIRA Description here"
-                )
-                gr.Textbox(
-                    type="text", label="Acceptance Criteria", info="Enter JIRA Acceptance Criteria here"
-                )
-                gr.Textbox(
-                    type="text", label="Story Points", info="Enter JIRA Story Points here"
-                )
-                updateJira = gr.Button("Update JIRA",scale=0, variant="secondary")
-                updateJira.click(updateJiraClick, None, None)
+    gr.Markdown("### Updated User Story")
+    gr.Textbox(
+        type="text", label="JIRA Story Key", info="Enter JIRA ID here"
+    )
+    gr.Textbox(
+        type="text", label="Description", info="Enter JIRA Description here"
+    )
+    gr.Textbox(
+        type="text", label="Acceptance Criteria", info="Enter JIRA Acceptance Criteria here"
+    )
+    gr.Textbox(
+        type="text", label="Story Points", info="Enter JIRA Story Points here"
+    )
+    updateJira = gr.Button("Update JIRA",scale=0, variant="secondary")
+    updateJira.click(updateJiraClick, None, None)
+
+
+
+featureRequest = {
+    "key" : "IG-201181",
+    "ai_description" : "ai description",
+    "ai_acceptance_criteria" : "ai acceptance criteria",
+    "ai_story_points" : "5"
+}
+fq = featureRequest
+jira.updateJira(fq["key"],fq["ai_description"],fq["ai_acceptance_criteria"],fq["ai_story_points"])
