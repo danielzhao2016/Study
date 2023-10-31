@@ -1,58 +1,249 @@
-def updateJira(storyID, ai_description,ai_acceptance_criteria,ai_story_points):
-    # Set the Jira API endpoint URL and issue key
-    url = "https://jira.fis.dev/rest/api/2/issue/"+ storyID
-    comment_url="https://jira.fis.dev/rest/api/2/issue/"+ storyID+"/comment"
+import gradio as gr
+import multiprocessing as mp
+import autogen_agents
+import tkinter as tk
+from tkinter import messagebox
+import jira
 
-    # Set the new values in a dictionary
-    data = {
-        "fields": {
-            "description": "ai_description",
-            "customfield_18460": "ai_acceptance_criteria",
-            "customfield_10563": 5
-        } 
-    }
-    load_dotenv()
-    UNAME=getenv('UNAME')
-    PASSWORD=getenv('PASSWORD') 
+availableBots = [
+            ("./images/ai/f4.png", "Testing Engineer"),
+            ("./images/ai/f6.png", "DevOps Engineer"),
+            ("./images/ai/f7.png", "Security Engineer"),
+            ("./images/ai/f8.png", "Solution Architect"),
+            ("./images/ai/f9.png", "DB Administrator"),
+        ]
+selectedBots = [
+            ("./images/ai/f1.png", "Product Owner"),
+            ("./images/ai/f2.png", "Scrum Master"),
+            ("./images/ai/f3.png", "Software Engineer"),
+            ("./images/ai/f5.png", "UI/UX Designer"),
+            ("./images/ai/f10.png", "User"),
+        ]
+defaultStoryId = "CMCMP-79"
 
-    headers = {
-        "Content-Type": "application/json"
-    }
-    # Send a PUT request to update the issue with the new values
-    # response = requests.put(url, headers=headers, data=json.dumps({"fields": data}), auth=HTTPBasicAuth(UNAME, PASSWORD), verify=False)
-    response = requests.put(url, headers=headers, json=data, auth=HTTPBasicAuth(UNAME, PASSWORD), verify=False)
-
-    # Print the response status code and content
-    print("Status code:", response.status_code)
-    print("Response content:", response.content)
-    return response
+def updateJiraClick():
+    root = tk.Tk()
+    root.withdraw()
 
 
+    response = messagebox.askyesno("Update Jira", "Are you ready to update the Jira card? If so, click Yes. Click Cancel to make more refinements.")
 
-with gr.TabItem("Story Details", id="story") as summaryTab:
-    gr.Markdown("### Updated User Story")
-    gr.Textbox(
-        type="text", label="JIRA Story Key", info="Enter JIRA ID here"
+    if response:
+        featureRequest = {
+            "key" : "IG-201181",
+            "ai_description" : gr.get("Description"),
+            "ai_acceptance_criteria" : "ai acceptance criteria",
+            "ai_story_points" : "5"
+        }
+        fq = featureRequest
+        jira.updateJira(fq["key"],fq["ai_description"],fq["ai_acceptance_criteria"],fq["ai_story_points"])
+        print("Updating JIRA...")
+    else:
+        print("Update cancelled.")
+
+    root.destroy()
+
+def hideInputAccordion():
+    return gr.Accordion.update(open=False)
+
+def hideProgressAccordion():
+    return gr.Accordion.update(open=False)
+
+def showProgressAccordion():
+    return gr.Accordion.update(open=True, visible=True)
+
+def showSummaryAccordion():
+    return gr.Accordion.update(open=True, visible=True)
+
+queue = None
+progress = "Initializing.."
+prevProgress = "";
+chatProgress = []
+transcript = []
+summaryText = "Please refine the story to see the summary"
+
+def updateProgress():
+     global progress, prevProgress
+     if progress != prevProgress:
+          chatProgress.append((None, progress))
+          prevProgress = progress
+     return chatProgress
+
+def refineClick(jira_key):
+    global progress, queue
+    gr.Info("Querying OpenAI GPT-4 for response...")
+    progress = "Querying Wiki for context..."
+    context=autogen_agents.jira_query(jira_key)
+    #autogen_agents.setBots(selectedBots)
+    progress = "Loading relevant policies..."
+    updateProgress()
+    progress = "AI agents are refining the story..."
+    queue = mp.Queue()
+    process = mp.Process(
+        target=autogen_agents.ask_group,
+        args=(context, queue),
     )
-    gr.Textbox(
-        type="text", label="Description", info="Enter JIRA Description here"
-    )
-    gr.Textbox(
-        type="text", label="Acceptance Criteria", info="Enter JIRA Acceptance Criteria here"
-    )
-    gr.Textbox(
-        type="text", label="Story Points", info="Enter JIRA Story Points here"
-    )
-    updateJira = gr.Button("Update JIRA",scale=0, variant="secondary")
-    updateJira.click(updateJiraClick, None, None)
+    process.start()
 
+def updateRefinementProgress():
+    global summaryText, progress
 
+    if (queue == None):
+         return [("BotForce One", "Please click on Refine button to start the AI refinement process")]
+    if (queue.empty()):
+         return transcript
+    
+    messages = queue.get()
+    for i, msg in enumerate(messages):
+        transcript.append((None, msg))
+        summaryText = msg
 
-featureRequest = {
-    "key" : "IG-201181",
-    "ai_description" : "ai description",
-    "ai_acceptance_criteria" : "ai acceptance criteria",
-    "ai_story_points" : "5"
+    progress = "Completed!"
+
+    return transcript
+
+def unselectBot(state, evt: gr.SelectData):
+    print("You removed", selectedBots[evt.index])
+    availableBots.append(selectedBots[evt.index])
+    selectedBots.pop(evt.index)
+    return [availableBots, selectedBots]            
+
+def selectBot(state, evt: gr.SelectData):
+    print("You added", availableBots[evt.index])
+    selectedBots.append(availableBots[evt.index])
+    availableBots.pop(evt.index)
+    return [availableBots, selectedBots]            
+
+themeInfo = gr.themes.Base(
+    primary_hue="emerald",
+    secondary_hue="gray",
+    neutral_hue="slate",
+    radius_size="sm",
+    font=[gr.themes.GoogleFont('Titillium Web'), 'ui-sans-serif', 'system-ui', 'sans-serif']
+    )
+
+def setStoryKeyFromUrl(request: gr.Request):
+    global defaultStoryId
+    try:
+        defaultStoryId = request.query_params['key']
+    except:
+        pass
+    return defaultStoryId
+
+def getStoryId():
+    global defaultStoryId
+    return defaultStoryId
+
+def getSummaryText():
+    global summaryText
+    return summaryText
+
+css=""
+css1 = """
+.gradio-container { background-color:#EFEFEF }
+
+*[alt='Testing Engineer']:focus {
+    border:5px solid blue;
 }
-fq = featureRequest
-jira.updateJira(fq["key"],fq["ai_description"],fq["ai_acceptance_criteria"],fq["ai_story_points"])
+
+"""
+
+with gr.Blocks(title='FIS BotForce One',theme=themeInfo, css=css).queue() as demo:
+    gr.Markdown("<img  src='file/assets/Banner2.png' alt='image One'>")
+
+    with gr.Row():
+        with gr.Tabs() as tabs:
+            with gr.TabItem("Home"):
+                with gr.Accordion("Inputs") as inputAcc:
+                    gr.Markdown("### Select AI Expert Bots for refinement")
+                    with gr.Row():
+                            state = gr.State({'gallery_content': []})
+
+                            with gr.Column():
+                                gr.Markdown("### Available")
+                                unselectedBotsGallery = gr.Gallery(label="Available", show_label=False, elem_id="gallery", columns=[10], rows=[1], 
+                                                        object_fit="scale-down", value=availableBots, allow_preview=False,
+                                                        height="100", selected_index=None
+                                                        )
+                            
+                            with gr.Column():
+                                gr.Markdown("### Selected")
+                                selectedBotsGallery = gr.Gallery(label="Selected", show_label=False, elem_id="gallery", columns=[10], rows=[1], 
+                                                        object_fit="scale-down", value=selectedBots, allow_preview=False,
+                                                        height="100", selected_index=None
+                                                        )
+                            
+                            unselectedBotsGallery.select(selectBot, [state], [unselectedBotsGallery, selectedBotsGallery])
+                            selectedBotsGallery.select(unselectBot, [state], [unselectedBotsGallery, selectedBotsGallery])
+
+                    storyKeyTxt=gr.Textbox(
+                        type="text", label="JIRA Story Key", info="Enter JIRA ID here"
+                    )
+                    with gr.Row():
+                        refineBtn = gr.Button("Refine",scale=0, variant="primary")
+                        refineBtn.click(hideInputAccordion, None, inputAcc)
+                with gr.Accordion("Progress", visible=False) as progressAcc:png
+
+                    refineBtn.click(showProgressAccordion, None, progressAcc)
+
+                    gr.Markdown("### AI Bots are discussing and refining ...")
+                    with gr.Row():
+                            state = gr.State({'gallery_content': []})
+                            
+                            with gr.Column():
+                                selectedBotsGallery = gr.Gallery(label="Selected", show_label=False, elem_id="gallery", columns=[10], rows=[1], 
+                                                        object_fit="scale-down", value=selectedBots, allow_preview=False,
+                                                        height="100", selected_index=None
+                                                        )
+                                progressBots=gr.Chatbot(height='400px',show_copy_button=True,avatar_images=["assets/user.png", "assets/bot.png"],
+                                                        every=1, value=updateProgress
+                                                        )
+                                summaryBtn = gr.Button("Show Summary",scale=0, variant="primary", visible=True)
+                                summaryBtn.click(hideProgressAccordion, None, progressAcc)
+
+                with gr.Accordion("Summary", visible=False) as summaryAcc:
+                    summaryBtn.click(showSummaryAccordion, None, summaryAcc)
+
+                    gr.Markdown("### Summary of AI refinement")
+                    with gr.Row():
+                            with gr.Column():
+                                selectedBotsGallery = gr.Gallery(label="Selected", show_label=False, elem_id="gallery", columns=[10], rows=[1], 
+                                                        object_fit="scale-down", value=selectedBots, allow_preview=False,
+                                                        height="100", selected_index=None
+                                                        )
+                    gr.Markdown("### Recommendations:")
+                    summarymd = gr.Markdown(every=1,value=getSummaryText)
+
+            with gr.TabItem("Story Details", id="story") as summaryTab:
+                gr.Markdown("### Updated User Story")
+                gr.Textbox(
+                    type="text", label="JIRA Story Key", info="Enter JIRA ID here"
+                )
+                gr.Textbox(
+                    type="text", label="Description", info="Enter JIRA Description here"
+                )
+                gr.Textbox(
+                    type="text", label="Acceptance Criteria", info="Enter JIRA Acceptance Criteria here"
+                )
+                gr.Textbox(
+                    type="text", label="Story Points", info="Enter JIRA Story Points here"
+                )
+                updateJira = gr.Button("Update JIRA",scale=0, variant="secondary")
+                updateJira.click(updateJiraClick, None, None)
+
+
+            with gr.TabItem("Chat History"):
+                with gr.Column():
+                     botWindow=gr.Chatbot(height='400px',show_copy_button=True,avatar_images=["assets/user.png", "assets/bot.png"], every=1, value=updateRefinementProgress)
+                     refineBtn.click(refineClick,inputs=[storyKeyTxt])
+                     gr.Button("Refresh",scale=0)
+          #  with gr.TabItem("Settings"):
+          #      with gr.Row():
+          #           gr.Button("Refresh")
+
+    demo.load(setStoryKeyFromUrl, inputs=[], outputs=[storyKeyTxt])
+
+
+
+if __name__ == "__main__":
+    demo.launch() #allowed_paths=['/images'])
