@@ -1,83 +1,20 @@
-with gr.Blocks(title='FIS BotForce One',theme=themeInfo, css=css).queue() as demo:
+# Function to activate the Story Details tab
+def activateStoryDetails(state):  # <-- Added
+    state['active_tab'] = 'story'  # <-- Added
+
+with gr.Blocks(title='FIS BotForce One', theme=themeInfo, css=css).queue() as demo:
     gr.Markdown("<img  src='file/assets/Banner2.png' alt='image One'>")
 
     with gr.Row():
         with gr.Tabs() as tabs:
-            with gr.TabItem("Home"):
-                with gr.Accordion("Inputs") as inputAcc:
-                    gr.Markdown("### Select AI Expert Bots for refinement")
-                    with gr.Row():
-                            state = gr.State({'gallery_content': []})
+            # 2. Update your TabItem components to use the state to determine if they should be active:
+            with gr.TabItem("Home", active=state['active_tab'] == 'Home'):  # <-- Modified
+                ...  # The rest of your code for the Home tab remains unchanged
 
-                            with gr.Column():
-                                gr.Markdown("### Available")
-                                unselectedBotsGallery = gr.Gallery(label="Available", show_label=False, elem_id="gallery", columns=[10], rows=[1], 
-                                                        object_fit="scale-down", value=availableBots, allow_preview=False,
-                                                        height="100", selected_index=None
-                                                        )
-                            
-                            with gr.Column():
-                                gr.Markdown("### Selected")
-                                selectedBotsGallery = gr.Gallery(label="Selected", show_label=False, elem_id="gallery", columns=[10], rows=[1], 
-                                                        object_fit="scale-down", value=selectedBots, allow_preview=False,
-                                                        height="100", selected_index=None
-                                                        )
-                            
+                storyDetailBtn = gr.Button("Show Story Detail",scale=0, variant="primary")
+                # 4. Attach this function to the storyDetailBtn:
+                storyDetailBtn.click(activateStoryDetails, [state])  # <-- Added
 
-                    storyKeyTxt=gr.Textbox(
-                        type="text", label="JIRA Story Key", info="Enter JIRA ID here"
-                    )
-                    with gr.Row():
-                        refineBtn = gr.Button("Refine",scale=0, variant="primary")
-                        refineBtn.click(hideInputAccordion, None, inputAcc)
-                with gr.Accordion("Progress", visible=False) as progressAcc:
-                    refineBtn.click(showProgressAccordion, None, progressAcc)
-                    gr.Markdown("### AI Bots are discussing and refining ...")
-                    with gr.Row():
-                            state = gr.State({'gallery_content': []})
-                            
-                            with gr.Column():
-                                selectedBotsGallery2 = gr.Gallery(label="Selected", show_label=False, elem_id="gallery", columns=[10], rows=[1], 
-                                                        object_fit="scale-down", value=selectedBots, allow_preview=False,
-                                                        height="100", selected_index=None
-                                                        )
-                                progressBots=gr.Chatbot(height='400px',show_label=False,show_copy_button=False,layout="panel",avatar_images=["assets/user.png", "assets/bot.png"],
-                                                        every=1, value=updateProgress
-                                                        )
-                                summaryBtn = gr.Button("Show Summary",scale=0, variant="primary", visible=True)
-                                summaryBtn.click(hideProgressAccordion, None, progressAcc)
-
-                with gr.Accordion("Summary", visible=False) as summaryAcc:
-                    summaryBtn.click(showSummaryAccordion, None, summaryAcc)
-
-                    gr.Markdown("### Summary of AI refinement")
-                    with gr.Row():
-                            with gr.Column():
-                                selectedBotsGallery3 = gr.Gallery(label="Selected", show_label=False, elem_id="gallery", columns=[10], rows=[1], 
-                                                        object_fit="scale-down", value=selectedBots, allow_preview=False,
-                                                        height="100", selected_index=None
-                                                        )
-                            unselectedBotsGallery.select(selectBot, [state], [unselectedBotsGallery, selectedBotsGallery, selectedBotsGallery2, selectedBotsGallery3])
-                            selectedBotsGallery.select(unselectBot, [state], [unselectedBotsGallery, selectedBotsGallery, selectedBotsGallery2, selectedBotsGallery3])
-                    gr.Markdown("### Recommendations:")
-                    summarymd = gr.Markdown(every=1,value=getSummaryText)
-                    storyDetailBtn = gr.Button("Show Story Detail",scale=0, variant="primary")
-
-            with gr.TabItem("Story Details", id="story") as summaryTab:
-                gr.Markdown("### Updated User Story")
-                jiraStoryKey = gr.Textbox(
-                    type="text", label="JIRA Story Key", info="Enter JIRA ID here", interactive=True
-                )
-                jiraDescription = gr.Textbox(
-                    type="text", label="Description", info="Enter JIRA Description here", interactive=True
-                )
-                jiraAcceptance = gr.Textbox(
-                    type="text", label="Acceptance Criteria", info="Enter JIRA Acceptance Criteria here", interactive=True
-                )
-                jiraStoryPoints = gr.Textbox(
-                    type="text", label="Story Points", info="Enter JIRA Story Points here", interactive=True
-                )
-                updateJira = gr.Button("Update JIRA",scale=0, variant="secondary")
-                updateJira.click(updateJiraClick, None, None)
-
-                clearButton = gr.ClearButton([jiraStoryKey, jiraDescription, jiraAcceptance, jiraStoryPoints], variant="secondary")
+            # Another change for the Story Details tab:
+            with gr.TabItem("Story Details", id="story", active=state['active_tab'] == 'story'):  # <-- Modified
+                ...  # The rest of your code for the Story Details tab remains unchanged
