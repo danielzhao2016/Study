@@ -1,20 +1,25 @@
-import tkinter as tk
-from tkinter import messagebox
+def update_jira_ticket(base_url, ticket_id, fields, username, password):
+    """
+    Update a Jira ticket with specified fields.
 
-def updateJiraClick():
-    # Create the root window but don't show it
-    root = tk.Tk()
-    root.withdraw()
+    :param base_url: Base URL of the Jira instance.
+    :param ticket_id: ID or key of the Jira ticket to update.
+    :param fields: Dictionary of fields to update.
+    :param username: Jira username.
+    :param password: Jira password.
+    """
+    url = f"{base_url}/rest/api/2/issue/{ticket_id}"
+    headers = {
+        "Content-Type": "application/json"
+    }
+    data = {
+        "fields": fields
+    }
 
-    # Create and display a messagebox asking for confirmation
-    response = messagebox.askyesno("Confirmation", "Do you really want to update?")
-
-    # Check user's response
-    if response:
-        # Code to update JIRA goes here
-        print("Updating JIRA...")
+    response = requests.put(url, json=data, headers=headers, auth=HTTPBasicAuth(username, password), verify=False)
+    # Notice the `verify=False` above to skip SSL certificate verification
+    
+    if response.status_code == 204:  # 204 No Content means successful update
+        print(f"Ticket {ticket_id} updated successfully.")
     else:
-        print("Update cancelled.")
-
-    # Destroy the root window
-    root.destroy()
+        print(f"Failed to update ticket {ticket_id}. Status code: {response.status_code}, Response: {response.text}")
