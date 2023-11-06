@@ -1,20 +1,2 @@
-# Function to activate the Story Details tab
-def activateStoryDetails(state):  # <-- Added
-    state['active_tab'] = 'story'  # <-- Added
-
-with gr.Blocks(title='FIS BotForce One', theme=themeInfo, css=css).queue() as demo:
-    gr.Markdown("<img  src='file/assets/Banner2.png' alt='image One'>")
-
-    with gr.Row():
-        with gr.Tabs() as tabs:
-            # 2. Update your TabItem components to use the state to determine if they should be active:
-            with gr.TabItem("Home", active=state['active_tab'] == 'Home'):  # <-- Modified
-                ...  # The rest of your code for the Home tab remains unchanged
-
-                storyDetailBtn = gr.Button("Show Story Detail",scale=0, variant="primary")
-                # 4. Attach this function to the storyDetailBtn:
-                storyDetailBtn.click(activateStoryDetails, [state])  # <-- Added
-
-            # Another change for the Story Details tab:
-            with gr.TabItem("Story Details", id="story", active=state['active_tab'] == 'story'):  # <-- Modified
-                ...  # The rest of your code for the Story Details tab remains unchanged
+He identifed many issue during the git migration project and often did over time to learn and complete many tasks which helps the project proceed. 
+If he can enable and encourage other team members to speak and use their telant that will improve the team work power and make projectsg to proceed faster. 
